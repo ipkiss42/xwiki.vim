@@ -1,0 +1,334 @@
+Run {{code language="vim"}}:match Todo /FIXME/{{/code}} to highlight known problems in this file.
+
+Note: when rendering is involved, the source of truth is always the XWiki behavior.
+
+== Bold ==
+
+**Basic bold**
+
+This is also** Bold **
+
+ **Bold**: NotBold
+
+This is **: Bold**
+
+ **Bold **NotBold
+
+**This should be bold on this line and
+ 
+on this one (space on the previous line)
+
+But NOT here**
+Bold again
+
+**Bold bold **NotBold** bold bold**
+
+**Bold //and italic// work fine together**
+
+//italic **and bold** also//
+
+**Bold {{foo}}highlighted maro{{/foo}} and [[link>>link.]]**
+
+== Escapes ==
+
+All of these should be highlighted:
+* ~-
+* ~(
+* ~)
+* ~^
+* ~[
+* ~]
+* ~/
+* ~\
+* ~~
+* ~|
+
+{{{This is escaped, {{even this /}}, [[this>>http://example.com]] and **this**}}}
+
+{{macro arg="some{{{arg}}}"}}<-- The opening macro tag should end here{{/macro}}
+
+== Links ==
+
+Valid links:
+* Plain link: http://www.example.com
+* Any protocol: foo://bar
+* Mailto: mailto:me
+* Basic link [[Super basic>>http://example.com]]
+* With {{code}}url:{{/code}}: [[link>>url:Target]]
+* Link inside []: [[[foo>>bar]]]
+* Extra params: [[link>>target||anchor="foo"||title="bar"]]
+* Extra params without quotes: [[link>>target||anchor=foo||title=bar]]
+* Images are like links: image:img.png
+
+Invalid links:
+* [[Invalid>>Foo~]]
+* [[]]
+* Escaped: http:~/~/example.com
+
+== Tables ==
+
+ |Not a table
+
+~|Also not a table|=
+
+|table |=row=1, col=1
+|row=2,{{code}}hello|={{/code}}col=1 multiline:
+ 
+still the same cell |= row=2, col=2 (bold)
+
+|=Title in bold|Not bold (% attr="value" %) hello |= Bold again
+|(((
+grouping
+==With title==
+)))|=Bold again
+
+
+== Lists ==
+
+Level 0
+*Level 0 as well, not highlighted
+* Level 1
+   * Level 1
+** Level 2
+** *Level 2
+*** Level 3
+* Level 1
+*** Level 2
+
+All of these should be highlighted:
+1. item 1
+11. item 1.1
+11. item 1.2
+111. item 1.2.1
+1. item 2
+1*. item 2.1
+1**. item 2.1.1
+1**. item 2.1.2
+1**1. item 2.1.2.1
+1**1. item 2.1.2.2
+  1**1*11**. Crazy sub-item :)
+1*. item 2.2
+2. Invalid, should be red
+3. Invalid, should be red
+
+Not highlighted:
+111 Missing '.'
+1* Missing '.'
+
+== Generic macros ==
+
+Note: most of these will generate rendering errors. They make sense only when looking at the source.
+
+{{BasicStandalone/}}
+{{BasicStandalone with="args"  /}}
+{{BasicStandalone with=args  /}}
+{{   InvalidMacroWithSpaceError /}}
+
+{{TwoParts}} some stuff
+inside{{/TwoParts}}
+
+{{Macro with="args" }} Foo {{/Macro}}
+Invalid closing with space error: {{A}}{{  /A}}
+
+Nesting works too: {{A}}{{B}} hello! {{/B}} world{{/A}}
+Invalid closing is not flagged as an error: {{A}}{{/B}}
+
+{{transclude name="template" args="foo=bar|baz=foobarbaz"}}
+Hello world!
+{{/transclude}}
+
+== Code macro ==
+
+{{code}}oneline code {{/code}}
+
+{{code}}multiline
+code{{/code}}
+
+Invalid closing tags are ignored (case sensitive):
+{{code}}code{{/Code}} more code{{/code}}
+
+Java syntax highlighting:
+{{code language="java"}}
+private String foo (int a) {
+    throw new RuntimeExeption("not implemented!");
+}
+{{/code}}
+
+Again:
+{{code    language=java }}
+private String foo (int a) {
+    throw new RuntimeExeption("not implemented!");
+}
+{{/code}}
+
+{{code language="bash"}}
+#!/bin/sh
+ls -l | wc -l
+echo "Hello $USER!"
+{{/code}}
+
+{{code language="html"}}
+<p>Some <i>italic</i> <a href="foo">text</a></p>
+{{/code}}
+
+{{code language="xwiki"}}
+This //should// be [[highlighted]] __normally__.
+{{/code}}
+
+== Html macro ==
+
+{{html}}<p>Some <i>italic</i> <a href="foo">text</a></p>{{/html}}
+
+{{html}}
+<p>
+    <!-- Comments work well -->
+    <b>multiline HTML with special char (&quot;)</b>
+</p>
+{{/html}}
+
+{{html }}The //wiki// [[syntax]] (% a=b %) is not active{{/html}}
+
+{{html wiki=true}}The //wiki// [[syntax]] (% a=b %) is active{{/html}}
+
+{{html}}<pre>
+<a href="foo">The entire line should look "escaped".</a>
+**still escaped** <p><b>on this line</b></p>
+</pre>
+{{/html}}
+
+{{html wiki=true}}<div>**<a href="foo">bold link (FIXME)</a>**</div>{{/html}}
+
+{{html wiki=true}}
+* List item
+** Other item (should not be bold)
+*** Third item (**bold here**)
+{{/html}}
+
+== Preformatted macro ==
+
+{{preformatted}} The //wiki// [[syntax]] (% a=b %) is active{{/preformatted}}
+
+{{preformatted}} <p><b class="someClass">HTML is <i>also</i> <pre>properly (FIXME)</pre> highlighted</b></p> everywhere{{/preformatted}}
+
+== Comment macro ==
+
+{{comment}} Some comment here {{/comment}}
+
+{{comment}}
+This
+is a {{/Comment}}
+multiline comment
+ending here (FIXME)
+{{/comment}}
+
+== Plantuml macro ==
+
+This requires the following plugin to work: https://github.com/aklt/plantuml-syntax
+No error should be printed if the plugin is missing.
+
+{{plantUML}}
+@startuml
+:Customer: -> (Withdraw)
+note right of (Withdraw) : This is an example.
+@enduml
+{{/plantUML}}
+
+Same with param
+
+{{plantUML imageOnly="false"}}
+@startuml
+participant "Foo Bar" as FB
+:Customer: -> (Withdraw)
+note right of (Withdraw) : This is an example.
+@enduml
+{{/plantUML}}
+
+== Formula macro ==
+
+{{formula}}\sum_{n=1}^\infty\frac{1}{n^2}=\frac{\pi^2}{6}{{/formula}}
+
+{{formula}}
+\begin{dialogue}{Fred}
+Switch the visual to main screen so we
+can get a good look.\end{dialogue}
+\intextslug[day]{in or out}
+\centretitle{http://dvc.org.uk/sacrific.txt/}
+{{/formula}}
+
+== Quotes ==
+
+Level 0
+> Level 1
+> > Also Level 1
+>> Level 2
+>>> Level 3
+
+== Random stuff ==
+
+Line NOT highlighted here: ----
+Line highlighted below:
+----
+Line NOT highlighted below:
+---
+
+(((Some
+multiline grouping.
+Only the grouping sign is highlighted...
+... **except** for __special__ [[things>>.]] {{inside /}}, of course.
+==== Even titles! ====
+End of grouping)))
+
+== Titles ==
+
+=== Valid ===
+
+ === Also valid ===
+
+=== Again valid (unbalanced) =
+
+=== Again valid (unbalanced 2) =============
+
+=== Test **bold** Title ===
+
+=== Title with stuff after ===NotTitle
+
+=== Title=NotTitle
+
+Equal signs in nested construct need special care:
+=== (% some=stuff %) Still {{transclude name="foo" args=""/}}valid(%%) ===
+
+
+===This title spans
+multiple
+lines===
+
+=== Title
+ 
+Still part of the title (due to the space on the previous line)
+
+This is not in the title due to the empty line before.
+
+
+# Markdown titles do not work
+a === This doesn't either ===
+
+Everything should be highlighted here (FIXME):
+= T1
+== T2
+=== T3
+==== T4
+===== T5
+====== T6
+======= T7
+======== T8
+
+Same here (FIXME):
+= T1 =
+== T2 ==
+=== T3 ===
+==== T4 ====
+===== T5 =====
+====== T6 ======
+======= T7 =======
+======== T8 ========
+
