@@ -144,7 +144,7 @@ sy region xwikiCommentMacro start="{{comment\s*}}" end="{{/comment}}" keepend
 " The plantuml syntax is not shipped with Vim, so it is likely missing.
 " Load it silently to ignore errors.
 if exists("b:current_syntax") | unlet b:current_syntax | endif
-sy include @xwikiPlantumlSyntax syntax/plantuml.vim
+silent! sy include @xwikiPlantumlSyntax syntax/plantuml.vim
 sy region xwikiPlantumlMacro start="{{plantUML\>[^}]*}}" end="{{/plantUML}}"me=s-1 keepend contains=xwikiMacroTag,@xwikiPlantumlSyntax
 
 if exists("b:current_syntax") | unlet b:current_syntax | endif
