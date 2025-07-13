@@ -84,24 +84,23 @@ sy match xwikiExtraAttributeMarker /%)/ contained
 sy region xwikiExtraAttribute start=/(%/ end=/%)/ keepend contains=xwikiExtraAttributeMarker,xwikiAttributeName,xwikiAttributeValue
 
 " See test cases to understand the complex skip pattern
-sy region xwikiH1 start="^\s*="      end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
-sy region xwikiH2 start="^\s*=="     end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
-sy region xwikiH3 start="^\s*==="    end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
-sy region xwikiH4 start="^\s*===="   end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
-sy region xwikiH5 start="^\s*====="  end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
-sy region xwikiH6 start="^\s*======" end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
+sy region xwikiH1 start="^\s*=[^=]"      end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
+sy region xwikiH2 start="^\s*==[^=]"     end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
+sy region xwikiH3 start="^\s*===[^=]"    end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
+sy region xwikiH4 start="^\s*====[^=]"   end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
+sy region xwikiH5 start="^\s*=====[^=]"  end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
+sy region xwikiH6 start="^\s*======[^=]" end="^$\|=\+" skip='(%.\{-}%)\|{{.\{-}}}' keepend contains=@xwikiTop
 
 sy match xwikiLinkInternalMarker ">>" contained
 sy match xwikiLinkInternalMarker "||" contained
-" FIXME: not working
-"sy match xwikiLinkParams "||.*" contained contains=xwikiLinkInternalMarker,xwikiAttributeName,xwikiAttributeValue
-sy match xwikiLinkParams "\(||\)\@<=.\+\]\]"me=e-2 contained contains=xwikiAttributeName,xwikiAttributeValue
+sy region xwikiLinkRaw start="\w\+://" end="\W*\_s"me=s-1 oneline
+sy match  xwikiLinkRaw "mailto:\S\+"
+sy match  xwikiLinkRaw "image:\S\+"
 " The ms=e-2 trick allows highlighting [[[foo]]] correctly (i.e. with the link
 " inside [ and ] characters)
-sy region xwikiLink start="\[*\[\[."ms=e-2,me=e-1 end="\]\]" skip="\~\]" oneline keepend contains=xwikiLinkParams,xwikiLinkInternalMarker
-sy region xwikiLink start="\w\+://" end="\W*\_s"me=s-1 oneline
-sy match  xwikiLink "mailto:\S\+"
-sy match  xwikiLink "image:\S\+"
+sy region xwikiLink start="\[*\[\[."ms=e-2,me=e-1 end="\]\]" skip="\~\]" oneline keepend contains=xwikiLinkInternalMarker,xwikiLinkTarget,xwikiLinkParams
+sy region xwikiLinkTarget start="\(>>\)\@<=" end="\]\]\|||"me=s-1 contained
+sy region xwikiLinkParams start="\(||\)\@<=" end="\(\]\]\)\@=" contained contains=xwikiAttributeName,xwikiAttributeValue
 
 sy match xwikiMacroStartMarker "{{/\?" contained
 sy match xwikiMacroStartMarkerError "{{\s\+"hs=s+2 contained contains=xwikiMacroStartMarker
@@ -192,7 +191,10 @@ XwikiHiLink xwikiH6 Title
 
 XwikiHiLink xwikiSpecialChars Special
 XwikiHiLink xwikiLinkInternalMarker Statement
-XwikiHiLink xwikiLink Underlined
+hi default xwikiLink guifg=#4fa6ed
+hi default xwikiLinkUrl gui=underline guifg=#48b0bd
+XwikiHiLink xwikiLinkTarget xwikiLinkUrl
+XwikiHiLink xwikiLinkRaw xwikiLinkUrl
 XwikiHiLink xwikiAttributeName Type
 XwikiHiLink xwikiAttributeValue String
 XwikiHiLink xwikiMacroName Statement
